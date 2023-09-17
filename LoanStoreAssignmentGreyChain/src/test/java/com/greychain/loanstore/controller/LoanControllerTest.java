@@ -2,6 +2,7 @@ package com.greychain.loanstore.controller;
 
 import com.greychain.loanstore.entity.AggregateData;
 import com.greychain.loanstore.entity.Loan;
+import com.greychain.loanstore.exception.LoanNotFoundException;
 import com.greychain.loanstore.service.AggregationService;
 import com.greychain.loanstore.service.LoanService;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
@@ -67,6 +68,7 @@ public class LoanControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(loanToAdd, response.getBody());
     }
+
 
     @Test
     void getLoanById_ExistingLoanId_ReturnsLoan() {
@@ -140,6 +142,17 @@ public class LoanControllerTest {
         assertEquals(25000, response.getBody().getAggregateInterest());
         assertEquals(0.02, response.getBody().getAggregatePenalty());
     }
+
+    @Test
+    void getLoanById_InvalidLoanId_ThrowsLoanNotFoundException() {
+        // Mock loanService behavior for an invalid loan ID
+        when(loanService.getLoanById("100")).thenReturn(null);
+
+        // Assert that a LoanNotFoundException is thrown
+        assertThrows(LoanNotFoundException.class, () -> loanController.getLoanById("100"));
+    }
+
+
 
 
 }

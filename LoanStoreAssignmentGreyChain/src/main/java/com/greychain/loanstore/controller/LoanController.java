@@ -3,6 +3,8 @@ package com.greychain.loanstore.controller;
 
 import com.greychain.loanstore.entity.AggregateData;
 import com.greychain.loanstore.entity.Loan;
+import com.greychain.loanstore.exception.CustomerNotFoundException;
+import com.greychain.loanstore.exception.LoanNotFoundException;
 import com.greychain.loanstore.service.AggregationService;
 import com.greychain.loanstore.service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,25 +30,39 @@ public class LoanController {
 
     @GetMapping
     public ResponseEntity<List<Loan>> getAllLoans() {
-        List<Loan> loans = loanService.getAllLoans();
-        return ResponseEntity.ok(loans);
+        try {
+            List<Loan> loans = loanService.getAllLoans();
+            return ResponseEntity.ok(loans);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @PostMapping("/add")
     public ResponseEntity<Loan> addLoan(@RequestBody Loan loan) {
-        Loan addedLoan = loanService.addLoan(loan);
-        return ResponseEntity.status(HttpStatus.CREATED).body(addedLoan);
+        try {
+            Loan addedLoan = loanService.addLoan(loan);
+            return ResponseEntity.status(HttpStatus.CREATED).body(addedLoan);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
     @GetMapping("/{loanId}")
     public ResponseEntity<Loan> getLoanById(@PathVariable String loanId) {
         Loan loan = loanService.getLoanById(loanId);
+        if (loan == null) {
+            throw new LoanNotFoundException("Loan with ID " + loanId + " not found.");
+        }
         return ResponseEntity.ok(loan);
     }
 
     @GetMapping("/customer/{customerId}")
     public ResponseEntity<List<Loan>> getLoansByCustomerId(@PathVariable String customerId) {
         List<Loan> loans = loanService.getLoansByCustomerId(customerId);
+        if (loans.isEmpty()) {
+            throw new CustomerNotFoundException("Loans not found for customer with ID " + customerId);
+        }
         return ResponseEntity.ok(loans);
     }
 
