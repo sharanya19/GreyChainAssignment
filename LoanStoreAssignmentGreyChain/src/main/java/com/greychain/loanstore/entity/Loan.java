@@ -142,5 +142,22 @@ public class Loan {
         isCancelled = cancelled;
     }
 
+    @Override
+    public String toString() {
+        return "Loan{" +
+                "loanId='" + loanId + '\'' +
+                ", customerId='" + customerId + '\'' +
+                ", lenderId='" + lenderId + '\'' +
+                ", amount=" + amount +
+                ", remainingAmount=" + remainingAmount +
+                ", paymentDate=" + paymentDate +
+                ", interestPerDay=" + interestPerDay +
+                ", dueDate=" + dueDate +
+                ", penaltyPerDay=" + penaltyPerDay +
+                ", isCancelled=" + isCancelled +
+                '}';
+    }
+
+
 
 }
